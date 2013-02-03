@@ -1,5 +1,3 @@
-(load "match-post.lsp")
-
 (defun assert-equal (exp1 exp2)
   (if (equal exp1 exp2)
 	  (print "Test passed.")

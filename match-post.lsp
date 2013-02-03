@@ -116,6 +116,8 @@
   
 (defun match (pattern data)
   (cond
+	((or (not (listp pattern)) (not (listp data))) NIL) ;; check if pattern and data are list
+
 	((null pattern) (match-null-pattern data)) ;; case 1: pattern is nil
 	((null data) (match-null-data pattern)) ;; case 2: if data is nil
 	(T (cond
@@ -138,11 +140,4 @@
 	  ((only-one-binding result) (car result))
 	  (T result))))
 	
-
-;; revision 1: consider unifying the output to a list of a-list, do result rewrite later
-;; revision 2: when seeing a list (around by parensis) in a pattern, it is a sub-query, BUT the result of the sub-query is not independent from following check. we have to carry the binding
-;;             DFS problem: checking inconsistent binding during top-down traversal, or during traversing back??
-;; revision 3: sanity check of data and pattern format, see if they are valid (parenthesis equal or not): it seems redundant. the lisp intepreter will check
-
-
 ;; DO we need to check if input are both lists?
