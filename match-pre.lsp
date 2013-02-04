@@ -1,6 +1,6 @@
 ;; Pattern Match with pre-order DFS traversal
 
-(defun is-submatch (token)
+(defun is-subpattern (token)
   (listp token))
 
 (defun is-variable (token)
@@ -55,7 +55,6 @@
 		  (update-bindings key value (cdr bindings))
 		  (cons (try-add-binding key value (car bindings)) (update-bindings key value (cdr bindings))))))
 
-;; TODO. first check conflict	
 (defun match-variable (pattern data bindings)
   (let ((key (car pattern))
 		(value (car data)))
@@ -65,10 +64,11 @@
 		  (if (null new-bindings)
 			  NIL
 			  (match (cdr pattern) (cdr data) new-bindings))))))
-(defun match-submatch (pattern data bindings)
-  (if (not (listp (car data))) ;; if data is not a list. is this test necessary?
-	  NIL
-	  (match (cdr pattern) (cdr data) (match (car pattern) (car data) bindings))))
+
+(defun match-subpattern (pattern data bindings)
+;;  (if (not (listp (car data))) ;; if data is not a list. is this test necessary?
+;;	  NIL
+	  (match (cdr pattern) (cdr data) (match (car pattern) (car data) bindings)))
 
 (defun match-null-data (pattern bindings)
   (if (null pattern)
@@ -82,22 +82,18 @@
 
 (defun match (pattern data bindings)
   (cond
-	
 	((or (not (listp pattern)) (not (listp data))) NIL) ;; check if pattern and data are list
-	
 	((null bindings) NIL) ;; if current bindings is NIL, no need to search further
-
 	((null pattern) (match-null-pattern data bindings)) ;; case 1: pattern is nil
 	((null data) (match-null-data pattern bindings)) ;; case 2: if data is nil
-
 	(T (cond
-		 ((is-single (car pattern)) (match-single pattern data bindings)) ;; matches single
-		 ((is-any (car pattern)) (match-any pattern data bindings)) ;; matches kleen star
+		 ((is-single (car pattern)) (match-single pattern data bindings)) ;; matches ?
+		 ((is-any (car pattern)) (match-any pattern data bindings)) ;; matches *
 		 ((is-variable (car pattern)) (match-variable pattern data bindings)) ;; matches variable
-		 ((is-submatch (car pattern)) (match-submatch pattern data bindings)) ;; matches list
+		 ((is-subpattern (car pattern)) (match-subpattern pattern data bindings)) ;; matches subpattern
 		 (T (if (equal (car pattern) (car data)) ;; match atoms
-				(match (cdr pattern) (cdr data) bindings) ;; match succeed
-				NIL))))))						 ;; mismatch
+				(match (cdr pattern) (cdr data) bindings) ;; succeed
+				NIL))))))						 ;; fail
 
 (defun only-one-binding (bindings)
   (null (cdr bindings)))
@@ -109,5 +105,3 @@
 	  ((is-false result) NIL)
 	  ((only-one-binding result) (car result))
 	  (T result))))
-
-;; DO we need to check if input are both lists?
