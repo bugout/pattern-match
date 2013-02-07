@@ -4,6 +4,24 @@ COMS 4701 Artificial Intelligence Project 1
 
 =============
 
+Input format: 
+(load "match-pre.lisp") or (load "match-post.lisp")
+
+(pattern-match pattern data)
+---------------------------
+
+Examples:
+
+(pattern-match '(?x 2 (?x)) '(1 2 (1))) 
+((?x 1))
+ 
+(pattern-match '(?x 2 (?x)) '(3 2 (1))) 
+NIL
+ 
+(pattern-match '(1 (* ?x *)) '(1 (a (b c) d))) 
+(((?x a)) ((?x (b c))) ((?x d)))
+
+
 Pattern matching can be modeled as a search problem on the syntax tree
 of pattern and data. We use DFS search to search for matching
 patterns.
@@ -18,26 +36,20 @@ version, bindings are passed from parents to their children. If there
 is conflicts when matching children, nil value is returned. If no
 conflict is found, we expand the binding and continue to search down.
 
----------------------------
-Input format: 
-(pattern-match pattern data)
----------------------------
-
-Examples:
-
-(pattern-match '(?x 2 (?x)) '(1 2 (1))) ((?x 1))
- 
-(pattern-match '(?x 2 (?x)) '(3 2 (1))) NIL
- 
-(pattern-match '(1 (* ?x *)) '(1 (a (b c) d))) (((?x a)) ((?x (b c)))
-((?x d)))
  
 ---------------------------
 More about testing
 ---------------------------
 'test.lsp' is a simple test script to check the
-result.  (runtest) validates the correctness of our implementations.
+result.
+(runtest) validates the correctness of our implementations.
+
+Note that if it prints out "Test fails", it does not necessarily mean the answer is not correct. In some test cases, I am just producing the result in different orders. The order should not matter.
+
 (time (runtesttime)) tests the performance of our implementations.
+
+
+Here is the profiling result running the compiled version in clisp on my desktop:
 
 Performance of post-order version:
 Real time: 0.779717 sec.
